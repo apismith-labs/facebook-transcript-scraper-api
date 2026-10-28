@@ -1,4 +1,3 @@
-[![Apify runs](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fapi.apify.com%2Fv2%2Facts%2Fapple_yang~facebook-transcript-scraper-api&query=%24.data.stats.totalRuns&label=Apify%20runs&color=brightgreen)](https://apify.com/apple_yang/facebook-transcript-scraper-api)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 # Facebook Transcript Scraper API
