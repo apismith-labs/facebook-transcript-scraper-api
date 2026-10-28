@@ -26,6 +26,8 @@ const REPO_ROOT = resolve(HERE, '../..');
 const JOURNAL_PATH = resolve(REPO_ROOT, 'sample-output/generated/nodejs-run-journal.jsonl');
 
 function loadEnvFile(path) {
+  // APIFY_SKIP_DOTENV=1 keeps a real .env out of tests and one-off scripts.
+  if (/^(1|true|yes)$/i.test((process.env.APIFY_SKIP_DOTENV ?? '').trim())) return;
   if (!existsSync(path)) return;
   for (const line of readFileSync(path, 'utf8').split('\n')) {
     const trimmed = line.trim();

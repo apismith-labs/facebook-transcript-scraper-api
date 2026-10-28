@@ -1,7 +1,5 @@
 # Use Facebook Transcript Scraper API with cURL
 
-[简体中文](README.zh-CN.md)
-
 One script, no SDK: create a Run, poll the same Run, read its Dataset.
 
 ## Requirements

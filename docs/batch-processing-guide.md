@@ -1,7 +1,5 @@
 # Batch processing
 
-[简体中文](zh-CN/batch-processing-guide.md)
-
 This Actor accepts one `videoUrl` per Run. There is no native bulk mode, so batching is a client
 responsibility: **one row = one independent Run**.
 

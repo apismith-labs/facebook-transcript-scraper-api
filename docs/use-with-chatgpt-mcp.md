@@ -1,7 +1,5 @@
 # Use with ChatGPT (MCP connector)
 
-[简体中文](zh-CN/use-with-chatgpt-mcp.md)
-
 ChatGPT can call remote MCP servers as connectors on plans that support them. Availability,
 naming, and menu positions change; treat this as a shape, not a click-by-click script.
 

@@ -1,9 +1,7 @@
-[![Facebook Transcript Scraper on Apify](https://apify.com/actor-badge?actor=apple_yang/facebook-transcript-scraper-api)](https://apify.com/apple_yang/facebook-transcript-scraper-api)
+[![Apify runs](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fapi.apify.com%2Fv2%2Facts%2Fapple_yang~facebook-transcript-scraper-api&query=%24.data.stats.totalRuns&label=Apify%20runs&color=brightgreen)](https://apify.com/apple_yang/facebook-transcript-scraper-api)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 # Facebook Transcript Scraper API
-
-[简体中文](README.zh-CN.md)
 
 Use the Apify Actor `apple_yang/facebook-transcript-scraper-api` as a Facebook transcript API:
 submit one public Facebook video URL and get transcript text, timestamped segments, and video
@@ -145,9 +143,14 @@ Guides: [Apify MCP](docs/use-with-apify-mcp.md) · [ChatGPT](docs/use-with-chatg
 - Public videos only. Private, friends-only, deleted, or region-locked videos may fail.
 - Transcription is audio-only; on-screen text is not extracted.
 - Free plans are limited to videos of 5 minutes or less.
-- `fb.watch` short links and `/share/v/<code>/` links are accepted by the clients, but the Actor
-  side is **unverified** — see the audit's unverified list.
-- A completed Run with a non-empty `errMsg` is a failure for that item.
+- `fb.watch` short links are accepted by the clients but remain unverified against the Actor;
+  `/share/r/<code>/`, `/watch/?v=`, `/<page>/videos/<id>/`, and `/reel/<id>/` were all confirmed in
+  the recorded live Runs.
+- `/video.php?v=` and bare `/videos/<id>/` are accepted by the validators but do not resolve at
+  Facebook for the IDs tested; prefer `/watch/?v=` or the page-scoped form.
+- A completed Run with a non-empty `errMsg` is a failure for that item, but `errMsg: 'no audio url
+  found'` is also what a transient Facebook-side failure looks like — one manual retry on a new Run
+  is reasonable for a URL shape that already worked.
 - This repository does not summarize, translate, or analyze transcripts; feed them to your own
   downstream model.
 
@@ -164,7 +167,7 @@ Guides: [Apify MCP](docs/use-with-apify-mcp.md) · [ChatGPT](docs/use-with-chatg
 | Production checklist | [Production integration](docs/production-integration-checklist.md) |
 | First-call questions | [FAQ](docs/faq.md) |
 | AI workflows | [Agent use cases](docs/ai-agent-use-cases.md) · [Prompt recipes](docs/prompt-recipes-for-facebook-video-analysis.md) |
-| Evidence | [Actor audit](docs/audit/actor_audit_20261028.md) |
+| Evidence | [Actor audit](docs/audit/actor_audit_20261028.md) · [Live run record](docs/audit/live_run_20261028.md) |
 
 ## Development
 
@@ -177,7 +180,8 @@ python -m compileall -q examples/python tests/python scripts
 python scripts/estimate_cost.py --videos 3 --minutes 8 --tier FREE
 ```
 
-No test requires `APIFY_TOKEN`, a `.env` file, or network access.
+No test requires `APIFY_TOKEN`, a `.env` file, or network access. The suites and CI set
+`APIFY_SKIP_DOTENV=1`, so a local `.env` cannot turn a test into a billable Run.
 
 ## License
 

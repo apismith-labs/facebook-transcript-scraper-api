@@ -1,7 +1,5 @@
 # Use with Gemini CLI
 
-[简体中文](zh-CN/use-with-gemini-cli-mcp.md)
-
 Gemini CLI reads MCP servers from its settings file (typically `~/.gemini/settings.json`). Remote
 HTTP servers are supported directly.
 

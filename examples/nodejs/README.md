@@ -1,7 +1,5 @@
 # Use Facebook Transcript Scraper API with Node.js
 
-[简体中文](README.zh-CN.md)
-
 Node.js 18+ using built-in `fetch`. No dependencies, no lockfile, no build step.
 
 ## Files

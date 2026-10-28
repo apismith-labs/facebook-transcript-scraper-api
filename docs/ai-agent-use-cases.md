@@ -1,7 +1,5 @@
 # AI agent use cases
 
-[简体中文](zh-CN/ai-agent-use-cases.md)
-
 The Actor returns text, timestamped segments, and metadata. It does not summarize, classify, or
 analyze — that belongs to your model. This page describes patterns that work well with the
 returned shape.

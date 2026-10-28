@@ -1,7 +1,5 @@
 # Use Facebook Transcript Scraper API with Python
 
-[简体中文](README.zh-CN.md)
-
 Python 3.10+ using only the standard library. No Apify SDK, no `requests`, no `.env` dependency.
 Run creation, polling, and Dataset reads are separate REST calls because each stage has a different
 retry rule.

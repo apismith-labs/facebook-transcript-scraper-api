@@ -1,7 +1,5 @@
 # Use with Cursor and VS Code
 
-[简体中文](zh-CN/use-with-cursor-vscode-mcp.md)
-
 Both editors support MCP servers through a project or user configuration file.
 
 ## Cursor

@@ -290,6 +290,10 @@ func maxInt(left, right int) int {
 }
 
 func loadDotEnv(path string) {
+	if skip := strings.TrimSpace(os.Getenv("APIFY_SKIP_DOTENV")); skip == "1" ||
+		strings.EqualFold(skip, "true") || strings.EqualFold(skip, "yes") {
+		return
+	}
 	content, err := os.ReadFile(path)
 	if err != nil {
 		return

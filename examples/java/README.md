@@ -3,7 +3,7 @@
 Java 17+, JDK only. No Maven, no Gradle, no third-party libraries: HTTP goes through
 `java.net.http`, and `Json.java` is a small reader/writer that covers what Apify returns.
 
-[简体中文](README.zh-CN.md) · [Quick start](../../docs/quickstart.md)
+[Quick start](../../docs/quickstart.md)
 
 ## Files
 

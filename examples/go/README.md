@@ -3,7 +3,7 @@
 Go 1.22+, standard library only. No module downloads, no build tags, no code
 generation: `go build ./...` works offline on a clean machine.
 
-[简体中文](README.zh-CN.md) · [Quick start](../../docs/quickstart.md)
+[Quick start](../../docs/quickstart.md)
 
 ## Files
 

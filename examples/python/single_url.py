@@ -41,7 +41,13 @@ JOURNAL_PATH = REPO_ROOT / "sample-output" / "generated" / "python-run-journal.j
 
 
 def load_env_file(path: Path) -> None:
-    """Tiny ``.env`` reader: KEY=VALUE lines, comments, no interpolation. Never overrides env."""
+    """Tiny ``.env`` reader: KEY=VALUE lines, comments, no interpolation. Never overrides env.
+
+    ``APIFY_SKIP_DOTENV=1`` disables it. The offline tests and CI set that flag so a developer's
+    real ``.env`` can never turn a test into a billable Run.
+    """
+    if os.getenv("APIFY_SKIP_DOTENV", "").strip().lower() in {"1", "true", "yes"}:
+        return
     if not path.is_file():
         return
     for line in path.read_text(encoding="utf-8").splitlines():

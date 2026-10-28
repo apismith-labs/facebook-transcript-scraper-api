@@ -1,7 +1,5 @@
 # Input and output fields
 
-[简体中文](zh-CN/input-output-fields.md)
-
 This document describes the Apify Actor `apple_yang/facebook-transcript-scraper-api`.
 
 Actor page: <https://apify.com/apple_yang/facebook-transcript-scraper-api>
@@ -34,15 +32,19 @@ videos, create several Runs — see [batch processing](batch-processing-guide.md
 Facebook spreads the same video across several URL shapes. The clients accept these and rewrite
 them to a canonical form before submitting:
 
-| Form | Example input | Canonical output |
-| --- | --- | --- |
-| Watch page | `https://www.facebook.com/watch/?v=1234567890` | same, `?v=` preserved |
-| Page video | `https://www.facebook.com/SomePage/videos/987654321/` | same, slug case preserved |
-| Videos path | `https://www.facebook.com/videos/1234567890` | `.../videos/1234567890/` |
-| Reel | `https://www.facebook.com/reel/1234567890/` | same |
-| Legacy entry | `https://www.facebook.com/video.php?v=1234567890` | same |
-| Share link | `https://www.facebook.com/share/v/AbCdEf123/` | same |
-| Short link | `https://fb.watch/AbCdEf123/` | same |
+| Form | Example input | Canonical output | Live status |
+| --- | --- | --- | --- |
+| Watch page | `https://www.facebook.com/watch/?v=1234567890` | same, `?v=` preserved | works |
+| Page video | `https://www.facebook.com/SomePage/videos/987654321/` | same, slug case preserved | works |
+| Videos path | `https://www.facebook.com/videos/1234567890` | `.../videos/1234567890/` | Facebook returned `Not Found` in 3/3 attempts |
+| Reel | `https://www.facebook.com/reel/1234567890/` | same | works |
+| Legacy entry | `https://www.facebook.com/video.php?v=1234567890` | same | Facebook returned its error page in 3/3 attempts |
+| Share link | `https://www.facebook.com/share/v/AbCdEf123/` | same | works (`/share/r/` verified) |
+| Short link | `https://fb.watch/AbCdEf123/` | same | unverified |
+
+The last column comes from the [live Runs of 2026-10-28](audit/live_run_20261028.md). The client
+still accepts every row, because the forms are valid Facebook shapes and may resolve for other
+videos; prefer the watch page or the page-scoped form when you control the input.
 
 Normalization rules applied by the clients:
 
@@ -59,8 +61,11 @@ Rejected on purpose: `/login`, `/groups/...`, `/stories/...`, `/photo/...`, `/sh
 Markdown-wrapped links, and any path that does not match the table above. If Facebook introduces a
 new share shape, update the validator rather than loosening it to "accept anything".
 
-> **Unverified:** whether the Actor itself resolves `fb.watch` and `/share/{v,r}/` links. The
-> clients pass them through; a resolution failure would surface as `actor_error`.
+> **Verified live (2026-10-28, 19 Runs):** `/share/r/<code>/`, `/watch/?v=`, `/<page>/videos/<id>/`,
+> and `/reel/<id>/` were each accepted and resolved by the Actor, returning the same video with the
+> item's `url` echoing the submitted URL verbatim. `/video.php?v=` and bare `/videos/<id>/` were
+> rejected by Facebook itself on three attempts each; `fb.watch` short links remain unverified — the
+> clients pass them through, and a resolution failure would surface as `actor_error`.
 
 ## Output
 
@@ -71,23 +76,23 @@ an inline array. Read the Dataset.
 
 | Field | Type | Notes |
 | --- | --- | --- |
-| `url` | string | Facebook video URL; may differ from the URL you submitted |
+| `url` | string | Facebook video URL. Echoed the submitted `share` URL verbatim in the recorded live run |
 | `title` | string | Caption/title. **Not** the transcript |
-| `videoUrl` | string | Media/CDN link. Never feed it back as `videoUrl` input |
+| `videoUrl` | string | Media/CDN link with expiring signature parameters. Never feed it back as `videoUrl` input |
 | `audioUrl` | string | Media link; may be empty or absent |
-| `createTime` | integer | 10-digit value, consistent with Unix seconds; unit **unverified** |
+| `createTime` | integer | Unix seconds — verified live (`1791609487`) |
 | `playCount` | integer | Plays, when available |
 | `commentCount` | integer | Comment count |
 | `reactionCount` | integer | Reactions |
-| `likesCount` | integer | Declared by the schema but absent from the README; semantics **unverified** |
-| `shareCount` | integer | Declared by the schema but absent from the README; semantics **unverified** |
-| `duration` | number | Believed seconds (README says seconds) |
+| `likesCount` | integer | Declared by the schema but absent from the README; populated on the live item (33). Meaning distinct from `reactionCount` is still undocumented |
+| `shareCount` | integer | Declared by the schema but absent from the README; populated on the live item (2) |
+| `duration` | number | **Seconds**, float (42.261 observed live) |
 | `nickname` | string | Creator display name |
 | `avatarUri` | string | Creator avatar; may be a temporary link |
 | `text` | string | **The transcript.** The field your application consumes |
-| `segments` | array | Objects with `start`, `end`, `text`; seconds assumed |
-| `errMsg` | string | Per-item business error. Non-empty means the item failed |
-| `timestamp` | string | Response timestamp, ISO 8601 in examples |
+| `segments` | array | Objects with `start`, `end`, `text`; seconds, 13 segments observed live |
+| `errMsg` | string | Per-item business error. Non-empty means the item failed; empty string on success |
+| `timestamp` | string | Response timestamp, ISO 8601 |
 
 The Dataset schema marks all 17 fields as `required`. That is a schema declaration, not evidence
 that every item carries them. Validate per item; never treat a missing key as a crash.
@@ -132,15 +137,20 @@ Python `TranscriptResult` and the Node.js result object expose the same informat
 
 ## Still unverified
 
-Confirmed against schemas and documentation only:
+Resolved by the [live Runs of 2026-10-28](audit/live_run_20261028.md): the `share`, `watch`,
+`page_video`, and `reel` forms are accepted; the returned `url` echoes the input; `duration` is
+seconds; `createTime` is Unix seconds; all 17 fields were present on a real item; and a failing Run
+is charged $0.001 without a `speech2text` event. What remains:
 
-- Real item cardinality: whether one URL can ever yield zero or multiple items.
+- Real item cardinality beyond the single-item case.
 - Real failure shape for private, deleted, or region-locked videos.
 - Whether `errMsg` and a non-empty `text` coexist, and which one is authoritative.
-- `fb.watch` and `/share/` resolution.
-- Whether the returned `url` echoes or rewrites the submitted form.
-- Whether `likesCount`/`shareCount` are populated consistently, or how they differ from
-  `reactionCount`.
+- `fb.watch` short-link resolution.
+- Whether `video.php?v=` or bare `/videos/<id>/` work for any video at all — Facebook answered both
+  with `Not Found` / a generic error page on every attempt, so the Actor never got a usable page.
+- Whether a legacy (pre-reel) page upload behaves differently from the reel-sourced ID tested.
+- Whether `likesCount`/`shareCount` are populated consistently across item types, and how they
+  differ from `reactionCount`.
 - Whether the transcription event is billed for silent or failed videos.
 
 Re-run the audit and update the contract JSON when the tagged Build changes.

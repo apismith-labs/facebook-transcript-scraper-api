@@ -1,7 +1,5 @@
 # FAQ
 
-[简体中文](zh-CN/faq.md)
-
 ### Do I need an Apify account?
 
 Yes. The Actor runs on Apify and is billed per event. Create a token in Apify Console under

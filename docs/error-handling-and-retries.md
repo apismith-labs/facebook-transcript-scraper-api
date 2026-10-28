@@ -1,7 +1,5 @@
 # Error handling and retries
 
-[简体中文](zh-CN/error-handling-and-retries.md)
-
 The single most expensive mistake with this Actor is retrying Run creation. A timed-out `POST` may
 already have produced a billable Run; sending it again can produce two.
 
@@ -27,7 +25,7 @@ replace it.
 | Status | Meaning | Retry? |
 | --- | --- | --- |
 | `success` | A non-empty transcript string exists | No |
-| `actor_error` | An item has a non-empty `errMsg` | No — the input failed |
+| `actor_error` | An item has a non-empty `errMsg` | Usually no; the `no audio url found` case is often transient — see below |
 | `empty` | The Dataset has no items | No |
 | `no_transcript` | `text` is null, missing, or empty | No — the video may be silent |
 | `unknown` | Unsupported type or unverifiable completeness | Investigate |
@@ -37,6 +35,26 @@ replace it.
 
 `actor_error` is never a success, even when `text` is also present. `no_transcript` is not an error
 in the transport sense: the Run worked, the item carries no usable speech.
+
+### `actor_error` with `errMsg: 'no audio url found'` is often transient
+
+The Actor scrapes the video page itself. When Facebook answers that fetch with a checkpoint or a
+generic error page, the Actor still finishes the Run, still writes one item, and fills the item with
+zeroes plus `errMsg: 'no audio url found'`. That is indistinguishable from a genuinely silent or
+unplayable video.
+
+In the recorded live round (2026-10-28) **2 of 11 otherwise-valid attempts** failed this way, and the
+identical URL succeeded seconds later on a fresh Run — see the
+[live run record](audit/live_run_20261028.md#5-the-actor-fails-transiently-and-it-looks-like-a-business-result).
+
+Practical rules:
+
+- Treat `actor_error` as final for malformed input (wrong ID shape, unsupported URL form).
+- For a URL shape that is known to work, allow **one** manual retry, and make it a **new Run** —
+  resuming the old one only re-reads the same Dataset item.
+- Bound the retries. A retry costs $0.001 even when it fails, because the item is still written.
+- Do not fan out retries in parallel: the failures are correlated with Facebook-side throttling.
+
 
 ## Exit codes
 

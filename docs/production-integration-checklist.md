@@ -1,7 +1,5 @@
 # Production integration checklist
 
-[简体中文](zh-CN/production-integration-checklist.md)
-
 Use this before pointing a real workload at the Actor.
 
 ## Credentials

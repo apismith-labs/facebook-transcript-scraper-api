@@ -33,6 +33,8 @@ public final class OfflineTests {
         buildMismatch();
         resumeIsGetOnly();
         jsonRoundTrip();
+        dotEnvQuoteStyles();
+        jsonBlanksAreNull();
         System.out.println(passed + " assertions passed");
     }
 
@@ -413,5 +415,34 @@ public final class OfflineTests {
         check(decoded.get("text").equals("hello \"world\"\nline"), "json string round trip");
         check(((Number) decoded.get("count")).intValue() == 3, "json number round trip");
         check(Json.asList(decoded.get("nested")).size() == 1, "json array round trip");
+    }
+
+    private static void dotEnvQuoteStyles() {
+        // `.env` files in the wild quote values with either style; both must reach the validator bare.
+        Map<String, String> values = TranscriptClient.parseDotEnvLines(List.of(
+                "# comment",
+                "APIFY_TOKEN='single-quoted'",
+                "APIFY_MAX_TOTAL_CHARGE_USD=\"0.10\"",
+                "APIFY_ACTOR_ID=plain",
+                "NOT_APIFY=ignored",
+                ""));
+        check("single-quoted".equals(values.get("APIFY_TOKEN")), "single quotes must be stripped");
+        check("0.10".equals(values.get("APIFY_MAX_TOTAL_CHARGE_USD")), "double quotes must be stripped");
+        check("plain".equals(values.get("APIFY_ACTOR_ID")), "unquoted values must be preserved");
+        check(!values.containsKey("NOT_APIFY"), "only APIFY_ keys are read");
+        check(values.size() == 3, "unexpected keys: " + values.keySet());
+    }
+
+    private static void jsonBlanksAreNull() {
+        // The other three CLIs emit null, not "", for absent optional fields.
+        TranscriptClient.Result result = new TranscriptClient.Result(
+                "success", "hi", List.of(), List.of(), "run1", "ds1",
+                "https://www.facebook.com/watch/?v=1", "https://www.facebook.com/watch/?v=1",
+                "watch", "", true, "", "", 1.5);
+        Map<String, Object> payload = Json.asObject(Json.parse(SingleUrl.renderJson(result)));
+        check(payload.get("error") == null, "blank error must be null");
+        check(payload.get("title") == null, "blank title must be null");
+        check(payload.get("nickname") == null, "blank nickname must be null");
+        check(Boolean.TRUE.equals(payload.get("datasetComplete")), "datasetComplete must survive");
     }
 }

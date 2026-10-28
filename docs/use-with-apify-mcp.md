@@ -1,7 +1,5 @@
 # Use with Apify MCP
 
-[简体中文](zh-CN/use-with-apify-mcp.md)
-
 Apify hosts an MCP server that can expose this Actor to an MCP-compatible client. This repository
 does not host an MCP server; it documents the path and the behaviour you should expect.
 

@@ -1,7 +1,5 @@
 # Use with Claude (MCP connector)
 
-[简体中文](zh-CN/use-with-claude-mcp.md)
-
 Claude supports remote MCP connectors in its desktop and web apps on eligible plans, and local
 stdio servers in Claude Desktop. Either path can reach this Actor.
 

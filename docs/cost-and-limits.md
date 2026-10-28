@@ -1,7 +1,5 @@
 # Cost and limits
 
-[简体中文](zh-CN/cost-and-limits.md)
-
 The Store page says **"from $1.00 / 1,000 results"**. That figure describes one of two billing
 events. The real cost of a transcript is the sum of both.
 
@@ -31,6 +29,19 @@ cost = 0.001 + ceil(max(duration_seconds, 1) / 60) × tier_price_per_minute
 
 One thousand one-minute videos cost **$5.50** on FREE, not $1.00. The Store headline counts only
 the dataset-item event.
+
+### Observed charge
+
+A recorded live Run on 2026-10-28 (42.261 s video, FREE tier) was charged **$0.0055**, itemised by
+Apify as `apify-default-dataset-item` $0.001 + `speech2text` $0.0045 — the formula above, with
+42.261 s rounded up to one started minute. See the [live run record](audit/live_run_20261028.md).
+
+### A failed Run is not free
+
+An unsuccessful Run still writes one Dataset item, so it is charged **$0.001** — never the
+`speech2text` event, because no transcription happened. Ten unsuccessful Runs in the 2026-10-28 round
+cost $0.010 combined. Budget for retries accordingly: a retried `actor_error` costs money even when
+it fails again. See the [live run record](audit/live_run_20261028.md#6-billing-behaviour-confirmed-on-failures).
 
 Estimate before you run:
 

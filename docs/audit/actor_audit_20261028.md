@@ -1,7 +1,5 @@
 # Actor audit — `apple_yang/facebook-transcript-scraper-api`
 
-[简体中文](../zh-CN/audit/actor_audit_20261028.md)
-
 Audit date: **2026-10-28**. Pinned build: **0.0.18** (`fZIlpYENof2jYqIJc`, finished
 2026-10-19T03:13:17.800Z). This document records what was read directly from Apify's public API and
 what remains unverified. It is the evidence base for the client code in this repository.
@@ -14,7 +12,7 @@ what remains unverified. It is the evidence base for the client code in this rep
 | `GET /v2/actor-builds/fZIlpYENof2jYqIJc` | Verbatim `inputSchema`, `actorDefinition.output`, `actorDefinition.storages.dataset.fields` |
 | `GET /v2/actors/qoPsXcbeGbncRrc4N/builds/fZIlpYENof2jYqIJc/openapi.json` | Run endpoint path, `token` query parameter, build id header |
 | `https://apify.com/apple_yang/facebook-transcript-scraper-api.md` | README-level behavior: public videos only, 5-minute free limit, output field prose |
-| No live Run was executed for this audit | Runtime behavior below is marked unverified where applicable |
+| Live Runs (2026-10-28, 19 Runs, $0.0595) | Runtime confirmation: build match on every Run, four URL forms accepted, two forms rejected by Facebook itself, 17 fields, units, two-event charge, all four clients, batch execution — see [live run record](live_run_20261028.md) |
 
 ## Input contract
 
@@ -53,9 +51,8 @@ Dataset fields from the pinned build (17 total):
    per item and treat missing keys as normal.
 4. **`errMsg` is the per-item business error.** A `SUCCEEDED` Run with a non-empty `errMsg` is a
    failure for that item.
-5. `duration` unit is believed to be seconds (README says "video duration (seconds)"); `createTime`
-   is a 10-digit integer, consistent with Unix seconds for the sample. Both remain unverified
-   beyond documentation.
+5. `duration` is **seconds** and `createTime` is **Unix seconds** — both confirmed by the live Run
+   of 2026-10-28 (`duration: 42.261`, `createTime: 1791609487`), not merely inferred from the README.
 
 ## Pricing captured 2026-10-28
 
@@ -93,8 +90,14 @@ Not assumed:
 - That `segments` is well-formed. Every entry is checked for finite `start`/`end` with
   `start <= end`; malformed entries are dropped from the normalized view but preserved in the raw
   item.
-- That short links and share links work. They are accepted by the client validator, but the Actor
-  side is unverified.
+- That short links and share links work. `share` (`/share/r/`), `watch`, `page_video`, and `reel`
+  were confirmed live on 2026-10-28. `fb.watch` short links remain unverified — they are accepted by
+  the client validator, but a short code can only be minted inside the Facebook apps.
+- That every accepted URL shape resolves. `/video.php?v=` and bare `/videos/<id>/` were answered by
+  Facebook with `Not Found` / its generic error page on three attempts each, while the page-scoped
+  `/<page>/videos/<same id>/` succeeded in the same minute. Treat those two shapes as unsupported.
+- That one `actor_error` means the input is bad. Two of eleven otherwise-valid attempts failed with
+  the same `errMsg: 'no audio url found'` and succeeded on a fresh Run seconds later.
 
 ## Reproduce this audit
 

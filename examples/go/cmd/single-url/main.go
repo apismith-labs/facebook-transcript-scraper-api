@@ -94,19 +94,20 @@ func printHuman(result transcript.Result) {
 
 func renderJSON(result transcript.Result) string {
 	payload := map[string]any{
-		"status":       result.Status,
-		"text":         nilIfEmpty(result.Text),
-		"segments":     result.Segments,
-		"items":        result.Items,
-		"runId":        nilIfEmpty(result.RunID),
-		"datasetId":    nilIfEmpty(result.DatasetID),
-		"sourceUrl":    result.SourceURL,
-		"canonicalUrl": result.CanonicalURL,
-		"urlForm":      result.URLForm,
-		"error":        nilIfEmpty(result.Error),
-		"title":        nilIfEmpty(result.Title),
-		"nickname":     nilIfEmpty(result.Nickname),
-		"duration":     nilIfZero(result.Duration, result.HasDuration),
+		"status":          result.Status,
+		"text":            nilIfEmpty(result.Text),
+		"segments":        result.Segments,
+		"items":           result.Items,
+		"runId":           nilIfEmpty(result.RunID),
+		"datasetId":       nilIfEmpty(result.DatasetID),
+		"sourceUrl":       result.SourceURL,
+		"canonicalUrl":    result.CanonicalURL,
+		"urlForm":         result.URLForm,
+		"error":           nilIfEmpty(result.Error),
+		"datasetComplete": result.DatasetComplete,
+		"title":           nilIfEmpty(result.Title),
+		"nickname":        nilIfEmpty(result.Nickname),
+		"duration":        nilIfZero(result.Duration, result.HasDuration),
 	}
 	encoded, err := json.MarshalIndent(payload, "", "  ")
 	if err != nil {
@@ -149,7 +150,12 @@ func journalPath() string {
 }
 
 // loadDotEnv reads APIFY_* keys from .env without overriding the environment.
+// APIFY_SKIP_DOTENV=1 disables it so tests never pick up a real token.
 func loadDotEnv(path string) {
+	if skip := strings.TrimSpace(os.Getenv("APIFY_SKIP_DOTENV")); skip == "1" ||
+		strings.EqualFold(skip, "true") || strings.EqualFold(skip, "yes") {
+		return
+	}
 	file, err := os.Open(path)
 	if err != nil {
 		return

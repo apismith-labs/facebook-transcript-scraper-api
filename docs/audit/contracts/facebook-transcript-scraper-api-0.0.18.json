@@ -1,6 +1,6 @@
 {
   "contractVersion": "1.0.0",
-  "evidenceStatus": "verified_from_build_api",
+  "evidenceStatus": "verified_from_build_api_and_live_runs",
   "actor": {
     "id": "apple_yang/facebook-transcript-scraper-api",
     "actId": "qoPsXcbeGbncRrc4N",
@@ -27,8 +27,12 @@
     "warning": "Field presence and runtime values are not guaranteed by this schema. It declares every dataset field as required; historical integration notes for sibling Actors show that Actor output can omit fields the schema marks required. Treat this document as a schema snapshot, not a runtime guarantee."
   },
   "input": {
-    "required": ["videoUrl"],
-    "modes": ["single_transcript"],
+    "required": [
+      "videoUrl"
+    ],
+    "modes": [
+      "single_transcript"
+    ],
     "fields": {
       "videoUrl": {
         "type": "string",
@@ -96,7 +100,10 @@
       "errMsg",
       "timestamp"
     ],
-    "documentedButNotInReadme": ["likesCount", "shareCount"],
+    "documentedButNotInReadme": [
+      "likesCount",
+      "shareCount"
+    ],
     "readmeOnlyFields": [],
     "cardinality": "unknown; one Run per URL is expected to yield one item, but the schema does not constrain it"
   },
@@ -135,13 +142,99 @@
     "publicContentOnly": true,
     "audioOnly": "The Actor transcribes audio; text burned into video frames is not extracted."
   },
+  "liveVerification": {
+    "date": "2026-10-28",
+    "runsCreated": 19,
+    "usageTotalUsd": 0.0595,
+    "buildNumber": "0.0.18",
+    "buildId": "fZIlpYENof2jYqIJc",
+    "videoDurationSeconds": 42.261,
+    "datasetItemCount": 1,
+    "segmentCount": 13,
+    "chargedEventCounts": {
+      "apify-default-dataset-item": 1,
+      "speech2text": 1
+    },
+    "successRunChargeUsd": 0.0055,
+    "failedRunChargeUsd": 0.001,
+    "urlForms": {
+      "share": {
+        "status": "confirmed",
+        "runId": "nLYG45kAbUi9k3QIw",
+        "attempts": 1
+      },
+      "watch": {
+        "status": "confirmed",
+        "runId": "zvjedku9xh0Qjp0Xb",
+        "attempts": 1
+      },
+      "page_video": {
+        "status": "confirmed",
+        "runId": "yFQeTefhJW8dJAXA9",
+        "attempts": 1
+      },
+      "reel": {
+        "status": "confirmed",
+        "runId": "FTmCQYemjjcRmanbR",
+        "attempts": 1
+      },
+      "video_php": {
+        "status": "rejected_by_facebook",
+        "attempts": 3,
+        "detail": "Three attempts returned Meta's generic error page while watch/?v= on the same video id succeeded."
+      },
+      "video": {
+        "status": "rejected_by_facebook",
+        "attempts": 3,
+        "detail": "Bare /videos/<id>/ returned Not Found, while /<page>/videos/<same id>/ succeeded in the same minute."
+      },
+      "short_link": {
+        "status": "unverified",
+        "detail": "No fb.watch code was available; the client validator accepts and forwards the form unchanged."
+      }
+    },
+    "clientsVerifiedLive": [
+      "python",
+      "nodejs",
+      "go",
+      "java"
+    ],
+    "batchVerifiedLive": {
+      "rows": 2,
+      "success": 2,
+      "rowIdSemantics": "CSV line number",
+      "runIds": [
+        "CSLnsRnS9xsbaxc6J",
+        "thfdnoDSa1nQrakgs"
+      ]
+    },
+    "transientFailureObservation": "2 of 11 otherwise-valid attempts returned actor_error with errMsg 'no audio url found' while the same URL succeeded on retry; treat that errMsg as retryable.",
+    "defectsFixedAfterLiveTesting": [
+      "Java readDotEnv stripped only double quotes, so a single-quoted .env value failed charge-cap validation.",
+      "Go --json omitted datasetComplete.",
+      "Java emitted empty strings for absent error/title/nickname instead of null."
+    ],
+    "confirmed": [
+      "The pinned build id was used by the service; client build verification passed on every Run.",
+      "share, watch, page_video, and reel URLs each returned the same 42.261 s video with a populated text and 13 segments.",
+      "The submitted URL is echoed verbatim in the item url field; no form is rewritten upstream.",
+      "All 17 declared dataset fields were present, including likesCount and shareCount.",
+      "duration is seconds (42.261); createTime is Unix seconds (1791609487).",
+      "segments are {start, end, text} in seconds; 13 segments, start <= end.",
+      "Billing is the two-event model; 42.261 s was billed as one started minute.",
+      "A failing Run still writes one dataset item and is charged $0.001 without a speech2text event.",
+      "All four reference clients completed a live Run and agreed on status, exit code, and JSON keys.",
+      "Batch execution mapped rowId to the CSV line number and reported the same total as its own estimate."
+    ],
+    "record": "docs/audit/live_run_20261028.md"
+  },
   "unverified": [
     "Whether a Run always returns exactly one dataset item per submitted URL.",
     "Real response shape for an unplayable, private, deleted, or region-locked video.",
     "Whether errMsg and a non-empty text can coexist, and which one is authoritative.",
-    "Whether fb.watch short links, /share/v/<code>/ and /share/r/<code>/ links are accepted and resolved.",
-    "Whether the canonical url field echoes the submitted URL or a rewritten one.",
-    "duration unit (seconds assumed) and createTime unit (10-digit values suggest seconds).",
+    "Whether fb.watch short links are accepted and resolved by the Actor; short links cannot be minted outside the Facebook apps, so the form is accepted by the clients but unproven upstream (share links were confirmed live on 2026-10-28).",
+    "Whether /video.php?v= and bare /videos/<id>/ resolve for any video: three attempts each hit Facebook-side errors, so the Actor's handling of those pages is unknown rather than disproved.",
+    "Whether a legacy (pre-reel) page upload behaves differently from the reel-sourced id used in the 2026-10-28 matrix.",
     "Whether the speech2text event is charged when a video has no speech or transcription fails.",
     "Whether likesCount and shareCount are populated on every item type.",
     "Bulk ordering does not apply because this Actor has no bulk mode."

@@ -436,34 +436,55 @@ public final class TranscriptClient {
         return "";
     }
 
-    /** Reads APIFY_* keys from a .env file; the caller decides how to apply them. */
+    /**
+     * Reads APIFY_* keys from a .env file; the caller decides how to apply them.
+     * APIFY_SKIP_DOTENV=1 disables it so tests never pick up a real token.
+     */
     public static Map<String, String> readDotEnv(java.nio.file.Path path) {
         Map<String, String> values = new LinkedHashMap<>();
+        String skip = System.getenv().getOrDefault("APIFY_SKIP_DOTENV", "").trim();
+        if (skip.equals("1") || skip.equalsIgnoreCase("true") || skip.equalsIgnoreCase("yes")) {
+            return values;
+        }
         if (!java.nio.file.Files.exists(path)) {
             return values;
         }
         try {
-            for (String line : java.nio.file.Files.readAllLines(path)) {
-                String trimmed = line.trim();
-                if (trimmed.isEmpty() || trimmed.startsWith("#")) {
-                    continue;
-                }
-                int separator = trimmed.indexOf('=');
-                if (separator <= 0) {
-                    continue;
-                }
-                String key = trimmed.substring(0, separator).trim();
-                if (!key.startsWith("APIFY_")) {
-                    continue;
-                }
-                String value = trimmed.substring(separator + 1).trim();
-                if (value.length() >= 2 && value.startsWith("\"") && value.endsWith("\"")) {
-                    value = value.substring(1, value.length() - 1);
-                }
-                values.put(key, value);
-            }
+            return parseDotEnvLines(java.nio.file.Files.readAllLines(path));
         } catch (IOException ignored) {
             // A missing or unreadable .env is not an error: the environment is enough.
+            return values;
+        }
+    }
+
+    /**
+     * Parses already-read {@code .env} lines. Kept separate so the parser can be tested without
+     * depending on the {@code APIFY_SKIP_DOTENV} state of the test process.
+     */
+    static Map<String, String> parseDotEnvLines(java.util.List<String> lines) {
+        Map<String, String> values = new LinkedHashMap<>();
+        for (String line : lines) {
+            String trimmed = line.trim();
+            if (trimmed.isEmpty() || trimmed.startsWith("#")) {
+                continue;
+            }
+            int separator = trimmed.indexOf('=');
+            if (separator <= 0) {
+                continue;
+            }
+            String key = trimmed.substring(0, separator).trim();
+            if (!key.startsWith("APIFY_")) {
+                continue;
+            }
+            String value = trimmed.substring(separator + 1).trim();
+            if (value.length() >= 2) {
+                char first = value.charAt(0);
+                char last = value.charAt(value.length() - 1);
+                if ((first == '"' && last == '"') || (first == '\'' && last == '\'')) {
+                    value = value.substring(1, value.length() - 1);
+                }
+            }
+            values.put(key, value);
         }
         return values;
     }

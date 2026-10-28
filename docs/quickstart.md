@@ -1,7 +1,5 @@
 # Quick start
 
-[简体中文](zh-CN/quickstart.md)
-
 Run one public Facebook video URL through the Actor and print its transcript. Running the Actor may
 incur Apify charges — read [cost and limits](cost-and-limits.md) before a large job.
 
@@ -82,6 +80,10 @@ raw = result.items[0] if result.items else {}
 journal.
 
 The CLI variant adds journaling, `.env` loading, JSON output, and resume:
+
+`APIFY_SKIP_DOTENV=1` disables `.env` loading in every CLI (Python, Node.js, Go, Java). Use it in
+tests and one-off scripts: the offline suites and CI set it, so a local `.env` can never turn a test
+into a billable Run.
 
 ```bash
 python examples/python/single_url.py 'https://www.facebook.com/watch/?v=1234567890'

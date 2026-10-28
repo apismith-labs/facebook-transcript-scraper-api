@@ -132,10 +132,10 @@ public final class SingleUrl {
         payload.put("sourceUrl", result.sourceUrl());
         payload.put("canonicalUrl", result.canonicalUrl());
         payload.put("urlForm", result.urlForm());
-        payload.put("error", result.error());
+        payload.put("error", nullIfBlank(result.error()));
         payload.put("datasetComplete", result.datasetComplete());
-        payload.put("title", result.title());
-        payload.put("nickname", result.nickname());
+        payload.put("title", nullIfBlank(result.title()));
+        payload.put("nickname", nullIfBlank(result.nickname()));
         payload.put("duration", result.duration());
         payload.put("generatedAt", Instant.now().toString());
         return Json.write(payload);
@@ -143,5 +143,10 @@ public final class SingleUrl {
 
     private static String nullToEmpty(String value) {
         return value == null ? "" : value;
+    }
+
+    /** Blank optional values become JSON null, matching the other three clients. */
+    private static Object nullIfBlank(String value) {
+        return value == null || value.isBlank() ? null : value;
     }
 }

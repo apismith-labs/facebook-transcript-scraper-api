@@ -1,7 +1,5 @@
 # Prompt recipes for Facebook video transcripts
 
-[简体中文](zh-CN/prompt-recipes-for-facebook-video-analysis.md)
-
 These prompts assume you already have a `success` result with `text`, `segments`, `title`,
 `nickname`, and `url`. They are starting points, not guarantees.
 

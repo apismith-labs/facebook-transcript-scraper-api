@@ -16,6 +16,12 @@ URL = "https://www.facebook.com/watch/?v=901"
 
 
 class CliTests(unittest.TestCase):
+    def setUp(self):
+        # A developer's real .env must never turn these tests into billable Runs.
+        patcher = patch.dict(os.environ, {"APIFY_SKIP_DOTENV": "1"})
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
     def test_help_exits_zero(self):
         with contextlib.redirect_stdout(io.StringIO()), self.assertRaises(SystemExit) as context:
             single_url.main(["--help"])
@@ -28,10 +34,20 @@ class CliTests(unittest.TestCase):
         self.assertIn("Configuration error", error.getvalue())
 
     def test_missing_token_exits_two(self):
-        with patch.dict(os.environ, {}, clear=True), contextlib.redirect_stderr(io.StringIO()) as error:
+        # clear=True wipes the setUp flag too, so the skip flag has to be restated here.
+        cleared = {"APIFY_SKIP_DOTENV": "1"}
+        with patch.dict(os.environ, cleared, clear=True), contextlib.redirect_stderr(io.StringIO()) as error:
             code = single_url.main([URL, "--no-journal"])
         self.assertEqual(code, 2)
         self.assertIn("APIFY_TOKEN", error.getvalue())
+
+    def test_dotenv_is_ignored_when_the_skip_flag_is_set(self):
+        # Repo root is the test cwd, so a real .env would be visible here.
+        if not (ROOT / ".env").is_file():
+            self.skipTest("no .env in the repository root; nothing to ignore")
+        with patch.dict(os.environ, {"APIFY_SKIP_DOTENV": "1"}, clear=True):
+            single_url.load_env_file(ROOT / ".env")
+            self.assertNotIn("APIFY_TOKEN", os.environ)
 
     def test_json_output_uses_the_result_shape(self):
         result = TranscriptResult(
