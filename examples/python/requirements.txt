@@ -1,0 +1,2 @@
+# This Python example set uses the standard library only.
+# Keeping this file makes `pip install -r examples/python/requirements.txt` a safe no-op.

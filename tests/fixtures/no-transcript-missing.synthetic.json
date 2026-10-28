@@ -1,0 +1,11 @@
+{
+  "_fixture": "SYNTHETIC - the text key is absent entirely.",
+  "items": [
+    {
+      "url": "https://www.facebook.com/videos/1000000000000004/",
+      "title": "Synthetic partial item",
+      "errMsg": "",
+      "timestamp": "2026-10-28T00:00:00.000Z"
+    }
+  ]
+}

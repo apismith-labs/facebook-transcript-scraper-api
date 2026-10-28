@@ -1,0 +1,149 @@
+{
+  "contractVersion": "1.0.0",
+  "evidenceStatus": "verified_from_build_api",
+  "actor": {
+    "id": "apple_yang/facebook-transcript-scraper-api",
+    "actId": "qoPsXcbeGbncRrc4N",
+    "buildNumber": "0.0.18",
+    "buildId": "fZIlpYENof2jYqIJc",
+    "buildFinishedAtUtc": "2026-10-19T03:13:17.800Z",
+    "retrievedAt": "2026-10-28",
+    "defaultRunOptions": {
+      "build": "latest",
+      "memoryMbytes": 4096,
+      "timeoutSecs": 3600
+    },
+    "sources": [
+      "https://api.apify.com/v2/acts/apple_yang~facebook-transcript-scraper-api",
+      "https://api.apify.com/v2/actor-builds/fZIlpYENof2jYqIJc",
+      "https://api.apify.com/v2/actors/qoPsXcbeGbncRrc4N/builds/fZIlpYENof2jYqIJc/openapi.json",
+      "https://apify.com/apple_yang/facebook-transcript-scraper-api.md"
+    ]
+  },
+  "schemaProvenance": {
+    "input": "Verbatim inputSchema string returned by the fixed build endpoint.",
+    "dataset": "Verbatim actorDefinition.storages.dataset.fields returned by the fixed build endpoint.",
+    "actorOutput": "Verbatim actorDefinition.output returned by the fixed build endpoint.",
+    "warning": "Field presence and runtime values are not guaranteed by this schema. It declares every dataset field as required; historical integration notes for sibling Actors show that Actor output can omit fields the schema marks required. Treat this document as a schema snapshot, not a runtime guarantee."
+  },
+  "input": {
+    "required": ["videoUrl"],
+    "modes": ["single_transcript"],
+    "fields": {
+      "videoUrl": {
+        "type": "string",
+        "title": "The URL of the facebook",
+        "description": "The URL of the facebook you want to get the data from.",
+        "editor": "textfield",
+        "prefill": "https://www.facebook.com/61567530334836/videos/1115932820735409/",
+        "runtimeDefault": "none; the field is required"
+      }
+    },
+    "absentFields": {
+      "bulkUrls": "Not present in this Actor. Batch work requires one Run per URL.",
+      "usernames": "Not present in this Actor. There is no profile mode.",
+      "sessionid": "Not present in this Actor. Public videos only.",
+      "enhancedcrawl": "Not present in this Actor."
+    }
+  },
+  "output": {
+    "actorOutput": {
+      "actorOutputSchemaVersion": 1,
+      "title": "Output schema of Social media scraper",
+      "properties": {
+        "results": {
+          "type": "string",
+          "title": "Results",
+          "template": "{{links.apiDefaultDatasetUrl}}/items"
+        }
+      }
+    },
+    "datasetFields": {
+      "url": "string",
+      "title": "string",
+      "videoUrl": "string",
+      "audioUrl": "string",
+      "createTime": "integer",
+      "playCount": "integer",
+      "commentCount": "integer",
+      "reactionCount": "integer",
+      "likesCount": "integer",
+      "shareCount": "integer",
+      "duration": "number",
+      "nickname": "string",
+      "avatarUri": "string",
+      "text": "string",
+      "segments": "array<{start:number,end:number,text:string}>",
+      "errMsg": "string",
+      "timestamp": "string"
+    },
+    "datasetDeclaredRequired": [
+      "url",
+      "title",
+      "videoUrl",
+      "audioUrl",
+      "createTime",
+      "playCount",
+      "commentCount",
+      "reactionCount",
+      "likesCount",
+      "shareCount",
+      "duration",
+      "nickname",
+      "avatarUri",
+      "text",
+      "segments",
+      "errMsg",
+      "timestamp"
+    ],
+    "documentedButNotInReadme": ["likesCount", "shareCount"],
+    "readmeOnlyFields": [],
+    "cardinality": "unknown; one Run per URL is expected to yield one item, but the schema does not constrain it"
+  },
+  "pricing": {
+    "model": "PAY_PER_EVENT",
+    "capturedAt": "2026-10-28",
+    "events": {
+      "apify-default-dataset-item": {
+        "title": "result",
+        "priceUsd": 0.001,
+        "primary": true,
+        "note": "Charged per dataset item."
+      },
+      "speech2text": {
+        "title": "Cost-Effective Audio-to-Text (Auto)",
+        "unit": "minute",
+        "minimumBilledMinutes": 1,
+        "tieredPriceUsdPerMinute": {
+          "FREE": 0.0045,
+          "BRONZE": 0.0035,
+          "SILVER": 0.003,
+          "GOLD": 0.002,
+          "PLATINUM": 0.002,
+          "DIAMOND": 0.002
+        },
+        "note": "Documented as $0.002 to $0.0045 per minute depending on plan; any duration under one minute is billed as one minute."
+      }
+    },
+    "storePageClaim": "$1.00 / 1,000 results",
+    "storePageClaimScope": "Covers the dataset-item event only; it does not include the speech2text event."
+  },
+  "limits": {
+    "freePlanVideoDurationMinutes": 5,
+    "freePlanSource": "Actor README: free users can only try video transcription with a duration of no more than 5 minutes.",
+    "paidPlanDurationLimit": "Documented as not limited by duration.",
+    "publicContentOnly": true,
+    "audioOnly": "The Actor transcribes audio; text burned into video frames is not extracted."
+  },
+  "unverified": [
+    "Whether a Run always returns exactly one dataset item per submitted URL.",
+    "Real response shape for an unplayable, private, deleted, or region-locked video.",
+    "Whether errMsg and a non-empty text can coexist, and which one is authoritative.",
+    "Whether fb.watch short links, /share/v/<code>/ and /share/r/<code>/ links are accepted and resolved.",
+    "Whether the canonical url field echoes the submitted URL or a rewritten one.",
+    "duration unit (seconds assumed) and createTime unit (10-digit values suggest seconds).",
+    "Whether the speech2text event is charged when a video has no speech or transcription fails.",
+    "Whether likesCount and shareCount are populated on every item type.",
+    "Bulk ordering does not apply because this Actor has no bulk mode."
+  ]
+}

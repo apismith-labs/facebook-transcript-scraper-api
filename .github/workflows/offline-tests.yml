@@ -1,0 +1,148 @@
+name: Offline tests
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  python-offline:
+    name: Python ${{ matrix.python-version }} / ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ['3.10', '3.13']
+    env:
+      APIFY_TOKEN: ''
+      APIFY_MAX_TOTAL_CHARGE_USD: ''
+      APIFY_REQUIRE_MAX_TOTAL_CHARGE_USD: ''
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install declared Python dependencies (none)
+        run: python -m pip install --disable-pip-version-check -r examples/python/requirements.txt
+      - name: Confirm no dotenv file is present
+        run: python -c "from pathlib import Path; assert not Path('.env').exists(), 'CI must not use a local .env file'"
+      - name: Run offline Python tests
+        run: python -m unittest discover -s tests/python -v
+      - name: Compile Python sources
+        run: python -m compileall -q examples/python tests/python scripts
+      - name: Cost estimator smoke test
+        run: python scripts/estimate_cost.py --videos 2 --minutes 10 --tier FREE
+      - name: Batch plan smoke test (creates no Run)
+        run: python examples/python/batch_csv.py sample-data/facebook-video-urls.csv
+
+  node-offline:
+    name: Node ${{ matrix.node-version }} / ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            node-version: '18'
+          - os: ubuntu-latest
+            node-version: '20'
+          - os: ubuntu-latest
+            node-version: '22'
+          - os: windows-latest
+            node-version: '20'
+          - os: macos-latest
+            node-version: '20'
+    env:
+      APIFY_TOKEN: ''
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Confirm no dotenv file is present
+        run: node -e "const fs=require('node:fs'); if (fs.existsSync('.env')) throw new Error('CI must not use a local .env file')"
+      - name: Check ESM syntax
+        working-directory: examples/nodejs
+        run: node -e "const {spawnSync}=require('node:child_process'); for (const f of ['reliable-actor.mjs','client.mjs','cost.mjs','single-url.mjs','batch-csv.mjs','quickstart-single.mjs']) { const r=spawnSync(process.execPath,['--check',f],{stdio:'inherit'}); if (r.status!==0) process.exit(r.status||1); }"
+      - name: Run offline Node.js tests
+        run: node scripts/run_node_ci_tests.mjs
+      - name: Batch plan smoke test (creates no Run)
+        run: node examples/nodejs/batch-csv.mjs sample-data/facebook-video-urls.csv
+
+  go-offline:
+    name: Go ${{ matrix.go-version }} / ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            go-version: '1.22'
+          - os: ubuntu-latest
+            go-version: '1.23'
+          - os: macos-latest
+            go-version: 'stable'
+          - os: windows-latest
+            go-version: 'stable'
+    defaults:
+      run:
+        working-directory: examples/go
+    env:
+      APIFY_TOKEN: ''
+      GOFLAGS: '-mod=mod'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: ${{ matrix.go-version }}
+          cache: false
+      - name: Confirm no dotenv file is present
+        shell: bash
+        run: test ! -f ../../.env
+      - name: Check formatting
+        shell: bash
+        run: test -z "$(gofmt -l .)"
+      - name: Vet
+        run: go vet ./...
+      - name: Run offline Go tests
+        run: go test ./...
+      - name: Build all commands
+        run: go build ./...
+      - name: Batch plan smoke test (creates no Run)
+        run: go run ./cmd/batch-csv ../../sample-data/facebook-video-urls.csv
+
+  java-offline:
+    name: Java ${{ matrix.java-version }} / ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            java-version: '17'
+          - os: ubuntu-latest
+            java-version: '21'
+          - os: macos-latest
+            java-version: '21'
+    env:
+      APIFY_TOKEN: ''
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ matrix.java-version }}
+      - name: Confirm no dotenv file is present
+        run: test ! -f .env
+      - name: Compile and run offline Java tests
+        working-directory: examples/java
+        run: ./run_tests.sh
+      - name: Batch plan smoke test (creates no Run)
+        working-directory: examples/java
+        run: |
+          javac -encoding UTF-8 -d out $(find src/main/java -name '*.java')
+          java -cp out com.apismith.facebooktranscript.BatchCsv ../../sample-data/facebook-video-urls.csv

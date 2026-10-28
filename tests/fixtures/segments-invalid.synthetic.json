@@ -1,0 +1,32 @@
+{
+  "_fixture": "SYNTHETIC - segments contain invalid entries that must be dropped from the normalized view only.",
+  "items": [
+    {
+      "url": "https://www.facebook.com/reel/1000000000000007/",
+      "title": "Synthetic segment shapes",
+      "videoUrl": "https://video.example.invalid/clip.mp4",
+      "audioUrl": "",
+      "createTime": 1760410628,
+      "playCount": 1,
+      "commentCount": 0,
+      "reactionCount": 0,
+      "likesCount": 0,
+      "shareCount": 0,
+      "duration": 10,
+      "nickname": "Synthetic Creator",
+      "avatarUri": "",
+      "text": "Transcript with mixed segment shapes.",
+      "segments": [
+        { "start": 0, "end": 1.2, "text": "valid one" },
+        { "start": "0", "end": 2, "text": "string start" },
+        { "start": 3, "end": 2, "text": "end before start" },
+        { "start": 2, "end": 3 },
+        { "start": 4, "end": 5, "text": "valid two" },
+        "not an object",
+        { "start": -1, "end": 0, "text": "negative start" }
+      ],
+      "errMsg": "",
+      "timestamp": "2026-10-28T00:00:00.000Z"
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "_fixture": "SYNTHETIC - text is null, which must classify as no_transcript, not success.",
+  "items": [
+    {
+      "url": "https://www.facebook.com/watch/?v=1000000000000003",
+      "title": "Synthetic silent video",
+      "videoUrl": "https://video.example.invalid/clip.mp4",
+      "audioUrl": "https://video.example.invalid/audio.mp4",
+      "createTime": 1760410628,
+      "playCount": 3,
+      "commentCount": 0,
+      "reactionCount": 0,
+      "likesCount": 0,
+      "shareCount": 0,
+      "duration": 8.2,
+      "nickname": "Synthetic Creator",
+      "avatarUri": "",
+      "text": null,
+      "segments": [],
+      "errMsg": "",
+      "timestamp": "2026-10-28T00:00:00.000Z"
+    }
+  ]
+}

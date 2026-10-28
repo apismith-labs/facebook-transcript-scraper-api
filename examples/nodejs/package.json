@@ -1,0 +1,18 @@
+{
+  "name": "facebook-transcript-scraper-api-nodejs-examples",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Node.js examples for the Apify Facebook Transcript Scraper API",
+  "license": "MIT",
+  "author": "APISmith",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "single": "node single-url.mjs",
+    "batch": "node batch-csv.mjs",
+    "quickstart": "node quickstart-single.mjs",
+    "check": "node --check reliable-actor.mjs && node --check client.mjs && node --check single-url.mjs && node --check batch-csv.mjs && node --check cost.mjs"
+  }
+}

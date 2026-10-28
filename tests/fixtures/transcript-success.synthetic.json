@@ -1,0 +1,27 @@
+{
+  "_fixture": "SYNTHETIC - not a recorded Actor response. Shape follows the pinned build dataset schema.",
+  "items": [
+    {
+      "url": "https://www.facebook.com/watch/?v=1000000000000001",
+      "title": "Synthetic video for offline tests",
+      "videoUrl": "https://video.example.invalid/clip.mp4",
+      "audioUrl": "https://video.example.invalid/audio.mp4",
+      "createTime": 1760410628,
+      "playCount": 1200,
+      "commentCount": 14,
+      "reactionCount": 320,
+      "likesCount": 300,
+      "shareCount": 21,
+      "duration": 43.5,
+      "nickname": "Synthetic Creator",
+      "avatarUri": "https://scontent.example.invalid/avatar.jpg",
+      "text": "This is a synthetic transcript used only by offline tests.",
+      "segments": [
+        { "start": 0, "end": 2.4, "text": "This is a synthetic transcript" },
+        { "start": 2.4, "end": 5.1, "text": "used only by offline tests." }
+      ],
+      "errMsg": "",
+      "timestamp": "2026-10-28T00:00:00.000Z"
+    }
+  ]
+}

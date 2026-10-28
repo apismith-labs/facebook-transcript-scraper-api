@@ -1,0 +1,28 @@
+.env
+.env.*
+!.env.example
+
+# Generated runtime output
+sample-output/generated/
+
+# Keep committed example outputs
+!sample-output/*.json
+!sample-output/*.jsonl
+!sample-output/*.csv
+
+node_modules/
+dist/
+build/
+target/
+__pycache__/
+*.pyc
+.venv/
+venv/
+.DS_Store
+.idea/
+.vscode/
+*.log
+
+# Compiled example output
+examples/java/out/
+examples/go/bin/

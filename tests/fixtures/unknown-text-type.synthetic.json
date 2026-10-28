@@ -1,0 +1,24 @@
+{
+  "_fixture": "SYNTHETIC - text has an unsupported type and must classify as unknown.",
+  "items": [
+    {
+      "url": "https://www.facebook.com/reel/1000000000000005/",
+      "title": "Synthetic malformed item",
+      "videoUrl": "https://video.example.invalid/clip.mp4",
+      "audioUrl": "",
+      "createTime": 0,
+      "playCount": 0,
+      "commentCount": 0,
+      "reactionCount": 0,
+      "likesCount": 0,
+      "shareCount": 0,
+      "duration": 0,
+      "nickname": "",
+      "avatarUri": "",
+      "text": 0,
+      "segments": [],
+      "errMsg": "",
+      "timestamp": "2026-10-28T00:00:00.000Z"
+    }
+  ]
+}

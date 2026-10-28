@@ -1,0 +1,24 @@
+{
+  "_fixture": "SYNTHETIC - an item that carries both text and a business error.",
+  "items": [
+    {
+      "url": "https://www.facebook.com/reel/1000000000000002/",
+      "title": "Synthetic failing video",
+      "videoUrl": "https://video.example.invalid/clip.mp4",
+      "audioUrl": "",
+      "createTime": 1760410628,
+      "playCount": 0,
+      "commentCount": 0,
+      "reactionCount": 0,
+      "likesCount": 0,
+      "shareCount": 0,
+      "duration": 12,
+      "nickname": "Synthetic Creator",
+      "avatarUri": "",
+      "text": "Synthetic text that must not be treated as a success.",
+      "segments": [],
+      "errMsg": "Video is not available in this region",
+      "timestamp": "2026-10-28T00:00:00.000Z"
+    }
+  ]
+}
